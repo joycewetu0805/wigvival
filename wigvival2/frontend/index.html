@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>WIGVIVAL | Salon de Coiffure Premium - Montréal</title>
+  <meta name="description" content="Salon premium spécialisé dans la customisation, restauration et styling de perruques. Services exclusifs à Montréal, Québec." />
+  <meta name="keywords" content="perruque, customisation, restauration, lace front, wig, Québec, Montréal, salon premium, coiffure" />
+  <meta name="author" content="WIGVIVAL Salon" />
+  <meta name="robots" content="index,follow" />
+  <meta name="referrer" content="no-referrer-when-downgrade" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://wigvival.ca" />
+  <meta property="og:title" content="WIGVIVAL | Salon de Coiffure Premium - Montréal" />
+  <meta property="og:description" content="Excellence capillaire à Montréal. Customisation, restauration et styling de perruques premium." />
+  <meta property="og:image" content="https://wigvival.ca/images/og-image.jpg" />
+  <meta property="og:locale" content="fr_CA" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:creator" content="@wigvival" />
+
+  <!-- Favicons & theme -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#d4af37" />
+  <meta name="msapplication-TileColor" content="#0f172a" />
+  <meta name="theme-color" content="#0f172a" />
+
+  <!-- PWA / manifest -->
+  <link rel="manifest" href="/manifest.json" />
+
+  <!-- Canonical & hreflang -->
+  <link rel="canonical" href="https://wigvival.ca" />
+  <link rel="alternate" hreflang="fr" href="https://wigvival.ca/fr/" />
+  <link rel="alternate" hreflang="en" href="https://wigvival.ca/en/" />
+
+  <!-- DNS prefetch / preconnect for fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- Google Fonts (display=swap already present) -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Small critical loader styles inline (min) -->
+  <style>
+    :root{color-scheme: dark;}
+    html,body{margin:0;height:100%}
+    body{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial; background:#0f172a;color:#f8fafc;-webkit-font-smoothing:antialiased}
+    .loading{min-height:100vh;display:flex;align-items:center;justify-content:center}
+    .loader{width:48px;height:48px;border:3px solid rgba(212,175,55,0.2);border-radius:50%;border-top-color:#d4af37;animation:spin 1s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @media (prefers-reduced-motion:reduce){.loader{animation:none}}
+    /* hide root until React hydrates to avoid FOUC (will be removed by script) */
+    #root{visibility:hidden}
+  </style>
+
+  <!-- Structured data (minimal, SEO-friendly) -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@graph":[
+      {
+        "@type":"BeautySalon",
+        "@id":"https://wigvival.ca/#salon",
+        "name":"WIGVIVAL Salon",
+        "url":"https://wigvival.ca",
+        "priceRange":"$$",
+        "address":{
+          "@type":"PostalAddress",
+          "addressLocality":"Montréal",
+          "addressRegion":"QC",
+          "addressCountry":"CA"
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+
+<body class="antialiased">
+  <!-- Accessible loader -->
+  <div id="loading" class="loading" role="status" aria-live="polite" aria-label="Chargement de l'application">
+    <div class="loader" aria-hidden="true"></div>
+  </div>
+
+  <!-- React mount point -->
+  <div id="root" tabindex="-1"></div>
+
+  <!-- Vite entry (module) -->
+  <script type="module" src="/src/main.jsx"></script>
+
+  <!-- Hide loader as soon as DOM is interactive, and show #root -->
+  <script>
+    (function () {
+      function hideLoader() {
+        var loader = document.getElementById('loading');
+        var root = document.getElementById('root');
+        if (loader) loader.style.display = 'none';
+        if (root) root.style.visibility = 'visible';
+      }
+      // prefer DOMContentLoaded to be faster; fallback timeout for edge cases
+      if (document.readyState === 'interactive' || document.readyState === 'complete') {
+        hideLoader();
+      } else {
+        document.addEventListener('DOMContentLoaded', hideLoader, { once: true });
+        // safety fallback
+        setTimeout(hideLoader, 4000);
+      }
+    })();
+  </script>
+
+  <!-- noscript fallback -->
+  <noscript>
+    <style>#root{visibility:visible} #loading{display:none}</style>
+    <div style="background:#0f172a;color:#f8fafc;padding:2rem;text-align:center">
+      JavaScript est requis pour utiliser l'application. Activez JavaScript ou contactez le salon.
+    </div>
+  </noscript>
+</body>
+</html>

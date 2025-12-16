@@ -1,0 +1,8 @@
+export const BUSINESS_RULES = {
+  DEPOSIT_PERCENTAGE: 0.15, // ← 15%
+  TAXES: {
+    TPS: 0.05,
+    TVQ: 0.09975
+  },
+  MAX_APPOINTMENTS_PER_SLOT: 5
+};
