@@ -1,19 +1,35 @@
-import db from '../config/db.js';
-import bcrypt from 'bcryptjs';
+import { authenticateUser } from '../services/auth.service.js';
 
 export const login = async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  const [[user]] = await db.query(
-    'SELECT * FROM users WHERE email = ?',
-    [email]
-  );
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email et mot de passe requis',
+      });
+    }
 
-  if (!user) return res.status(401).json({ error: 'Identifiants invalides' });
+    const user = await authenticateUser(email, password);
 
-  const match = await bcrypt.compare(password, user.password);
-  if (!match) return res.status(401).json({ error: 'Identifiants invalides' });
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Identifiants invalides',
+      });
+    }
 
-  delete user.password;
-  res.json(user);
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
+  } catch (error) {
+    console.error('❌ login error:', error.message);
+
+    res.status(500).json({
+      success: false,
+      message: 'Erreur serveur lors de la connexion',
+    });
+  }
 };
