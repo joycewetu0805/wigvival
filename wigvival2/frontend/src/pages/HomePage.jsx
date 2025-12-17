@@ -24,32 +24,35 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchAll = async () => {
-      setLoading(true);
-      try {
-        const [sRes, stRes] = await Promise.allSettled([
-          api.get('/services'),
-          api.get('/stylists')
-        ]);
-        if (sRes.status === 'fulfilled') setServices(Array.isArray(sRes.value.data) ? sRes.value.data : []);
-        else {
-          setServices([]);
-          console.warn('services fetch failed', sRes.reason);
-        }
-        if (stRes.status === 'fulfilled') setStylists(Array.isArray(stRes.value.data) ? stRes.value.data : []);
-        else {
-          setStylists([]);
-          console.warn('stylists fetch failed', stRes.reason);
-        }
-      } catch (err) {
-        console.error(err);
-        toast.error('Erreur lors du chargement de la page d\'accueil');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAll();
-  }, []);
+  const fetchAll = async () => {
+    setLoading(true);
+    try {
+      const servicesRes = await api.get('/services');
+      const stylistsRes = await api.get('/stylists');
+
+      setServices(
+        servicesRes?.success && Array.isArray(servicesRes.data)
+          ? servicesRes.data
+          : []
+      );
+
+      setStylists(
+        stylistsRes?.success && Array.isArray(stylistsRes.data)
+          ? stylistsRes.data
+          : []
+      );
+    } catch (error) {
+      console.error(error);
+      toast.error("Erreur lors du chargement de la page d'accueil");
+      setServices([]);
+      setStylists([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchAll();
+}, []);
 
   const featuredServices = (services || []).filter(s => s.is_featured).slice(0, 3);
   const featuredStylists = (stylists || []).slice(0, 2);
