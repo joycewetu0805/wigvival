@@ -1,0 +1,91 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  phone     String?
+  role      Role     @default(CLIENT)
+  createdAt DateTime @default(now())
+
+  appointments Appointment[]
+}
+
+model Service {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  price       Float
+  duration    Int
+  category    String
+  features    Json?
+  isFeatured  Boolean  @default(false)
+
+  appointments   Appointment[]
+  availabilities Availability[]
+}
+
+model Stylist {
+  id          Int      @id @default(autoincrement())
+  firstName   String
+  lastName    String
+  bio         String
+  rating      Float    @default(5)
+  specialties Json
+
+  availabilities Availability[]
+  appointments  Appointment[]
+}
+
+model Availability {
+  id             Int      @id @default(autoincrement())
+  stylistId      Int
+  serviceId      Int?
+  start          DateTime
+  end            DateTime
+  maxClients     Int      @default(1)
+  currentClients Int      @default(0)
+  recurrence     String?
+  notes          String?
+
+  stylist Stylist  @relation(fields: [stylistId], references: [id])
+  service Service? @relation(fields: [serviceId], references: [id])
+}
+
+model Appointment {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  stylistId   Int
+  serviceId   Int
+  start       DateTime
+  end         DateTime
+  price       Float
+  status      AppointmentStatus @default(PENDING)
+  depositPaid Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  stylist Stylist @relation(fields: [stylistId], references: [id])
+  service Service @relation(fields: [serviceId], references: [id])
+}
+
+enum Role {
+  CLIENT
+  ADMIN
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
