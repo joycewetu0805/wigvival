@@ -34,40 +34,47 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!validateEmail(formData.email)) {
       toast.error('Adresse e-mail invalide');
       return;
     }
+
     if (!formData.password || formData.password.length < 6) {
       toast.error('Le mot de passe doit contenir au moins 6 caractères');
       return;
     }
 
+    if (!isLogin) {
+      if (!formData.firstName || !formData.lastName || !formData.phone) {
+        toast.error('Complétez tous les champs d\'inscription');
+        return;
+      }
+    }
+
     setProcessing(true);
+
     try {
       if (isLogin) {
-        // Login
+        // LOGIN
         const res = await api.post('/auth/login', {
           email: formData.email,
           password: formData.password
         });
-        const token = res?.data?.token;
-        if (token) {
-          localStorage.setItem('wigvival_token', token);
-          // optional: store user info
-          localStorage.setItem('wigvival_user', JSON.stringify(res.data.user || {}));
-          toast.success('Connexion réussie');
-          navigate('/dashboard');
-        } else {
-          throw new Error(res?.data?.message || 'Réponse invalide du serveur');
+
+        if (!res?.success) {
+          throw new Error(res?.message || 'Connexion échouée');
         }
+
+        localStorage.setItem(
+          'wigvival_user',
+          JSON.stringify(res.data)
+        );
+
+        toast.success('Connexion réussie');
+        navigate('/dashboard');
       } else {
-        // Register
-        if (!formData.firstName || !formData.lastName || !formData.phone) {
-          toast.error('Complétez tous les champs d\'inscription');
-          setProcessing(false);
-          return;
-        }
+        // REGISTER
         const res = await api.post('/auth/register', {
           firstName: formData.firstName,
           lastName: formData.lastName,
@@ -75,24 +82,25 @@ const LoginPage = () => {
           email: formData.email,
           password: formData.password
         });
-        toast.success(res?.data?.message || 'Inscription réussie — vous êtes connecté(e)');
-        // if API returns token on register, store and redirect
-        if (res?.data?.token) {
-          localStorage.setItem('wigvival_token', res.data.token);
-          localStorage.setItem('wigvival_user', JSON.stringify(res.data.user || {}));
-          navigate('/dashboard');
-        } else {
-          // otherwise go to login or verification flow if needed
-          setIsLogin(true);
+
+        if (!res?.success) {
+          throw new Error(res?.message || 'Inscription échouée');
         }
+
+        toast.success(res.message || 'Inscription réussie');
+        setIsLogin(true);
       }
     } catch (err) {
-      const msg = err?.response?.data?.message || err.message || 'Erreur réseau';
+      const msg =
+        err?.response?.data?.message ||
+        err.message ||
+        'Erreur réseau';
       toast.error(msg);
     } finally {
       setProcessing(false);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-noir-900 to-noir-800 py-12 flex items-center justify-center">

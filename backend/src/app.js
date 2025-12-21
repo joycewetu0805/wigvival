@@ -15,6 +15,9 @@ import paymentRoutes from './routes/payments.js';
 import uploadRoutes from './routes/uploads.js';
 import marketingRoutes from './routes/marketing.js';
 import galleryRoutes from './routes/gallery.js';
+import statsRoutes from './routes/stats.js';
+import meRoutes from './routes/me.js';
+import usersRoutes from './routes/users.js';
 
 
 /* ----------- ADMIN ROUTES ----------- */
@@ -35,7 +38,7 @@ app.use(morgan(config.env === 'production' ? 'combined' : 'dev'));
 /* ================== ROOT ================== */
 app.get('/', (req, res) => {
   res.json({
-    message: '🚀 WIGVIVAL API is running',
+    message: 'WIGVIVAL API is running',
     env: config.env,
   });
 });
@@ -61,6 +64,9 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/uploads', uploadRoutes);
 app.use('/api/marketing', marketingRoutes);
 app.use('/api/gallery', galleryRoutes);
+app.use('/api/stats', statsRoutes);
+app.use('/api/me', meRoutes);
+app.use('/api/users', usersRoutes);
 
 /* ================== ROUTES ADMIN ================== */
 app.use('/api/admin', adminRoutes);

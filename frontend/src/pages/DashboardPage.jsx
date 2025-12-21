@@ -21,13 +21,20 @@ const DashboardPage = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [processingCancel, setProcessingCancel] = useState({}); // { [id]: true }
+  
+  useEffect(() => {
+  const storedUser = localStorage.getItem('wigvival_user');
+  if (storedUser) {
+    setUser(JSON.parse(storedUser));
+  }
+}, []);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
         const [meRes, apptsRes] = await Promise.allSettled([
-          api.get('/me'),
+          
           api.get('/appointments') // backend should return appointments for current user
         ]);
         if (meRes.status === 'fulfilled' && meRes.value.data) setUser(meRes.value.data);
@@ -83,13 +90,17 @@ const DashboardPage = () => {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
             <div>
               <h1 className="text-4xl font-display font-bold text-gold-400 mb-2">Tableau de bord</h1>
-              <p className="text-beige-300">Bienvenue, {user?.firstName ? `${user.firstName} ${user.lastName || ''}` : '—'}</p>
+              <p className="text-beige-300"> Bienvenue, {user?.first_name ? `${user.first_name} ${user.last_name || ''}` : '—'}</p>
             </div>
             <div className="flex items-center space-x-4 mt-4 md:mt-0">
               <Link to="/booking" className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-gold-500 to-gold-600 text-noir-900 font-bold rounded-xl hover:from-gold-600 hover:to-gold-700 transition-all">
                 <Calendar className="w-5 h-5 mr-2" /> Nouvelle réservation
               </Link>
-              <button className="p-3 bg-noir-800/50 rounded-xl border border-beige-800/30 hover:bg-beige-800/30 transition-colors">
+             <button
+  onClick={() => navigate('/profile')}
+  className="p-3 bg-noir-800/50 rounded-xl border border-beige-800/30 hover:bg-beige-800/30 transition-colors"
+>
+
                 <Settings className="w-5 h-5 text-beige-400" />
               </button>
             </div>
@@ -103,8 +114,13 @@ const DashboardPage = () => {
                     <User className="w-8 h-8 text-noir-900" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-display font-bold text-beige-100">{user?.firstName ? `${user.firstName} ${user.lastName || ''}` : 'Utilisateur'}</h3>
-                    <p className="text-beige-400">Client depuis {user?.createdAt ? new Date(user.createdAt).getFullYear() : '—'}</p>
+                   <h3 className="text-xl font-display font-bold text-beige-100">
+  {user?.first_name ? `${user.first_name} ${user.last_name || ''}` : 'Utilisateur'}
+</h3>
+<p className="text-beige-400">
+  Client depuis {user?.created_at ? new Date(user.created_at).toLocaleDateString() : '—'}
+</p>
+
                   </div>
                 </div>
 

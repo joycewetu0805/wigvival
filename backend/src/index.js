@@ -7,13 +7,13 @@ const PORT = config.port;
 const startServer = async () => {
   try {
     await db.query('SELECT 1');
-    console.log('✅ MySQL connecté');
+    console.log('MySQL connecté');
 
     app.listen(PORT, () => {
-      console.log(`🚀 API running on http://localhost:${PORT}`);
+      console.log(`API running on http://localhost:${PORT}`);
     });
   } catch (err) {
-    console.error('❌ Erreur MySQL:', err.message);
+    console.error('Erreur MySQL:', err.message);
     process.exit(1);
   }
 };

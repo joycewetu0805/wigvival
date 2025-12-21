@@ -1,74 +1,106 @@
-import db from '../config/db.js';
 import bcrypt from 'bcryptjs';
+import db from '../config/db.js';
 
-/* =========================
-   REGISTER
-========================= */
+/**
+ * REGISTER
+ */
 export const register = async (req, res) => {
   try {
-    const { email, password, firstName, lastName, phone } = req.body;
+    const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: 'Email et mot de passe requis' });
+      return res.status(400).json({
+        success: false,
+        message: 'Email et mot de passe requis',
+      });
     }
-
-    const emailNormalized = email.toLowerCase().trim();
 
     const [[existingUser]] = await db.query(
       'SELECT id FROM users WHERE email = ?',
-      [emailNormalized]
+      [email]
     );
 
     if (existingUser) {
-      return res.status(409).json({ message: 'Utilisateur déjà existant' });
+      return res.status(409).json({
+        success: false,
+        message: 'Un compte existe déjà avec cet email',
+      });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const passwordHash = await bcrypt.hash(password, 10);
 
     await db.query(
-      `INSERT INTO users (email, password, first_name, last_name, phone)
-       VALUES (?, ?, ?, ?, ?)`,
-      [emailNormalized, hashedPassword, firstName, lastName, phone]
+      `INSERT INTO users (email, password_hash, role)
+       VALUES (?, ?, ?)`,
+      [email, passwordHash, 'client']
     );
 
-    return res.status(201).json({ message: 'Utilisateur créé avec succès' });
+    res.status(201).json({
+      success: true,
+      message: 'Compte créé avec succès',
+    });
+
   } catch (error) {
-    console.error('REGISTER ERROR:', error);
-    return res.status(500).json({ message: 'Erreur serveur' });
+    console.error('❌ register error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erreur serveur lors de l’inscription',
+    });
   }
 };
 
-/* =========================
-   LOGIN
-========================= */
+/**
+ * LOGIN
+ */
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: 'Email et mot de passe requis' });
+      return res.status(400).json({
+        success: false,
+        message: 'Email et mot de passe requis',
+      });
     }
 
-    const emailNormalized = email.toLowerCase().trim();
-
     const [[user]] = await db.query(
-      'SELECT * FROM users WHERE email = ?',
-      [emailNormalized]
+      `SELECT id, email, password_hash, role
+       FROM users
+       WHERE email = ?`,
+      [email]
     );
 
     if (!user) {
-      return res.status(401).json({ message: 'Identifiants invalides' });
+      return res.status(401).json({
+        success: false,
+        message: 'Identifiants invalides',
+      });
     }
 
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) {
-      return res.status(401).json({ message: 'Identifiants invalides' });
+    const isValid = await bcrypt.compare(password, user.password_hash);
+     if (!isValid) {
+    console.log('EMAIL:', email);
+    console.log('PASSWORD (clair):', password);
+    console.log('HASH DB:', user.password_hash);
+
+      return res.status(401).json({
+        success: false,
+        message: 'Identifiants invalides',
+      });
     }
 
-    delete user.password;
-    return res.json(user);
+    delete user.password_hash;
+
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
+
   } catch (error) {
-    console.error('LOGIN ERROR:', error);
-    return res.status(500).json({ message: 'Erreur serveur' });
+    console.error('❌ login error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erreur serveur lors de la connexion',
+    });
   }
 };

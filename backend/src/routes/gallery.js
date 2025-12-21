@@ -1,12 +1,12 @@
-import express from 'express';
-const router = express.Router();
+import { Router } from 'express';
+import {
+  getGallery,
+  getGalleryCategories
+} from '../controllers/gallery.controller.js';
 
-router.get('/', (req, res) => {
-  res.json([]);
-});
+const router = Router();
 
-router.get('/categories', (req, res) => {
-  res.json([]);
-});
+router.get('/', getGallery);
+router.get('/categories', getGalleryCategories);
 
 export default router;

@@ -52,8 +52,13 @@ const BookingPage = () => {
       try {
         const res = await api.get('/services');
         if (!mounted) return;
-        // Expect array of services; filter active ones
-        setServices(Array.isArray(res.data) ? res.data.filter(s => s.is_active !== false) : []);
+
+        setServices(
+          res?.success && Array.isArray(res.data)
+          ? res.data.filter(s => s.is_active !== false)
+        : []
+      );
+
       } catch (err) {
         console.error(err);
         toast.error('Impossible de charger les services.');
@@ -80,12 +85,15 @@ const BookingPage = () => {
       setSelectedTime('');
       try {
         // Backend expected endpoint (adjust if needed)
-        const res = await api.get(`/services/${selectedService.id}/availability`, {
-          params: { date: selectedDate }
-        });
-        if (!mounted) return;
-        // Expect array of times: ["09:00", "09:30", ...]
-        setAvailableTimes(Array.isArray(res.data) ? res.data : []);
+        const res = await api.get(
+         `/services/${selectedService.id}/availability`,
+          { params: { date: selectedDate } }
+        );
+
+        setAvailableTimes(
+          res?.success && Array.isArray(res.data) ? res.data : []
+      );
+
       } catch (err) {
         console.error(err);
         toast.error('Impossible de récupérer les créneaux disponibles.');
@@ -144,8 +152,9 @@ const BookingPage = () => {
         depositAmount: Number(calculateDeposit())
       };
       const res = await api.post('/appointments', payload);
-      // Expect created appointment with id
+
       const appointmentId = res?.data?.id || res?.data?.appointmentId;
+
       if (!appointmentId) {
         toast.success('Réservation créée. Vérifie ton tableau de bord.');
         setStep(4);

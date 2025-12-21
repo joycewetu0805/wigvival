@@ -1,22 +1,13 @@
 import db from '../config/db.js';
 
 const getAll = async () => {
-  const [rows] = await db.query(`
-    SELECT 
-      id,
-      name,
-      description,
-      price,
-      duration,
-      category,
-      is_featured
-    FROM services
-    WHERE is_active = 1
-    ORDER BY position ASC
-  `);
-  return rows;
+  try {
+    const [rows] = await db.query('SELECT * FROM services');
+    return rows;
+  } catch (error) {
+    console.error('❌ SERVICES SQL ERROR:', error);
+    throw error;
+  }
 };
 
-export default {
-  getAll,
-};
+export default { getAll };
